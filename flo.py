@@ -1,20 +1,30 @@
-import idaapi
+from idaapi import *
 
 hotkey_str = "Alt-r"
+default_operand = 0
 
 def go():
-        print GetDisasm(ScreenEA())
+    sEA = ScreenEA()
+    operand = GetOpnd(sEA,default_operand)
+    operand_val = GetOperandValue(sEA,default_operand)
+    print "Operand: "+operand
+    if operand_val:
+        print "Value: "+operand_val
+    #print operand_str+": "+str(operand_val)
+    #print GetDisasm(ScreenEA())
+
 
 try:
-        del_idc_hotkey(hotkey_str)
+    del_idc_hotkey(hotkey_str)
 except:
-        pass
+    pass
 
 # IDA binds hotkeys to IDC functions so a trampoline IDC function must be created
-CompileLine('static sobpy_key() { RunPythonStatement("go()"); }')
+idaapi.CompileLine('static sobpy_key() { RunPythonStatement("go()"); }')
 
 # Add the hotkey
-add_idc_hotkey(hotkey_str, 'sobpy_key')
+if add_idc_hotkey(hotkey_str, 'sobpy_key'):
+      print "Registered "+hotkey_str+" as hotkey"
 
 
 
